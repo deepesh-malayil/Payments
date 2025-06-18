@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Payments.Domain.Entities;
 using Payments.Domain.Events;
+using System.Linq;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -48,14 +49,18 @@ namespace Payments.Controllers
 
         // PUT api/<PaymentController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task PutAsync(Payment value)
         {
+            var paymentUpdatedEvent = new PaymentUpdatedEvent(value.Id, value.Amount, value.Currency, value.Status);
+            await _mediator.Publish(paymentUpdatedEvent);
         }
 
         // DELETE api/<PaymentController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
+            var paymentDeletedEvent = new PaymentDeletedEvent(id);
+            await _mediator.Publish(paymentDeletedEvent);
         }
     }
 }
